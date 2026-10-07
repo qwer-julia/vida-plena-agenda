@@ -40,7 +40,7 @@ flutter test
 | RF04 | Validação de conflito | Implementado | Mesmo profissional e horário bloqueado (canceladas não contam) |
 | RF05 | Minhas consultas | Implementado | Abas Futuras e Histórico |
 | RF06 | Confirmar, remarcar, cancelar | Implementado | Só consultas futuras |
-| RF07 | Lembrete | Implementado (verificar no aparelho) | 24 h antes (ou 1 h antes se faltar menos); cancela ao cancelar/remarcar. Testado com mock; envio real ainda não testado em aparelho |
+| RF07 | Lembrete | Implementado | 24 h antes (ou 1 h antes se faltar menos); cancela ao cancelar/remarcar. Testado com mock e em aparelho real (Samsung Galaxy M35, Android): a notificação chegou no horário programado |
 
 ## Status
 
