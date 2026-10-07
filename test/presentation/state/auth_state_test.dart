@@ -7,7 +7,7 @@ import 'package:vida_plena_agenda/presentation/state/auth_state.dart';
 class MockPatientRepository extends Mock implements PatientRepository {}
 
 void main() {
-  const ana = Patient(id: 'p1', name: 'Ana', email: 'ana@email.com', password: '123456');
+  final ana = Patient.withPassword(id: 'p1', name: 'Ana', email: 'ana@email.com', password: '123456');
   late MockPatientRepository repo;
   late AuthState state;
 

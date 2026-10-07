@@ -49,7 +49,7 @@ class AuthState extends ChangeNotifier {
       if (await _repository.findByEmail(email) != null) {
         throw const DomainException('Já existe uma conta com este e-mail.');
       }
-      final patient = Patient(
+      final patient = Patient.withPassword(
         id: _newId(),
         name: name.trim(),
         email: email.trim(),
@@ -66,7 +66,7 @@ class AuthState extends ChangeNotifier {
       Validators.ensureValidEmail(email);
       Validators.ensureValidPassword(password);
       final patient = await _repository.findByEmail(email);
-      if (patient == null || patient.password != password) {
+      if (patient == null || !patient.matchesPassword(password)) {
         throw const DomainException('E-mail ou senha incorretos.');
       }
       await _repository.setLoggedPatient(patient.id);

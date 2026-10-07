@@ -4,7 +4,7 @@ import 'package:vida_plena_agenda/data/local_patient_repository.dart';
 import 'package:vida_plena_agenda/domain/patient.dart';
 
 void main() {
-  const ana = Patient(id: 'p1', name: 'Ana', email: 'ana@email.com', password: '123456');
+  final ana = Patient.withPassword(id: 'p1', name: 'Ana', email: 'ana@email.com', password: '123456');
 
   Future<LocalPatientRepository> newRepo() async =>
       LocalPatientRepository(await SharedPreferences.getInstance());
@@ -26,7 +26,7 @@ void main() {
   test('save com mesmo id substitui o paciente', () async {
     final repo = await newRepo();
     await repo.save(ana);
-    await repo.save(const Patient(id: 'p1', name: 'Ana Maria', email: 'ana@email.com', password: '123456'));
+    await repo.save(Patient.withPassword(id: 'p1', name: 'Ana Maria', email: 'ana@email.com', password: '123456'));
     expect((await repo.findByEmail('ana@email.com'))?.name, 'Ana Maria');
   });
 

@@ -26,6 +26,7 @@ remarca e cancela consultas, e recebe lembrete local. Os dados ficam no aparelho
 - Estado: `provider`
 - Persistência: `shared_preferences` (JSON) atrás de uma interface de repositório
 - Lembretes: `flutter_local_notifications`
+- Senha: hash PBKDF2-HMAC-SHA256 com salt por usuário (`crypto`)
 - Testes: `flutter_test`, `mocktail`
 
 ## Como rodar
@@ -47,6 +48,7 @@ flutter test
 | Requisito | Tela ou módulo | Situação | Observação |
 |---|---|---|---|
 | RF01 | Cadastro e login | Implementado | Validação de e-mail e senha (mín. 6), sessão restaurada ao abrir |
+| RNF04 | Proteção dos dados | Implementado | Dados só no aparelho, sem backend; a senha é gravada apenas como hash PBKDF2 com salt (dados antigos em texto são migrados ao ler) |
 | RF02 | Especialidades e horários | Implementado | Catálogo local com profissionais e horários por dia |
 | RF03 | Novo agendamento | Implementado | Fluxo especialidade → profissional → horário → confirmação |
 | RF04 | Validação de conflito | Implementado | Mesmo profissional e horário bloqueado (canceladas não contam) |
