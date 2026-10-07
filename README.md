@@ -45,4 +45,4 @@ flutter test
 ## Status
 
 Fases 0 a 5 concluídas (estrutura, domínio, dados, estado, telas, lembretes).
-Próximo: testes de widget dedicados (CT05, CT06), cobertura, relatório e vídeo.
+Testes de widget dedicados (CT05, CT06) prontos. Próximo: capturas de tela, relatório e vídeo.
