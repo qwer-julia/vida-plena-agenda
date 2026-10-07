@@ -16,6 +16,13 @@ const _sizes = {
   'tablet (800x1280)': Size(800, 1280),
 };
 
+Future<void> tapVisible(WidgetTester tester, Finder finder) async {
+  await tester.ensureVisible(finder);
+  await tester.pumpAndSettle();
+  await tester.tap(finder);
+  await tester.pumpAndSettle();
+}
+
 void main() {
   for (final entry in _sizes.entries) {
     for (final scale in [1.0, 1.6]) {
@@ -41,30 +48,23 @@ void main() {
         expect(find.text('Entrar'), findsWidgets); // login
 
         // Erros de validação visíveis (campos vazios).
-        await tester.tap(find.widgetWithText(FilledButton, 'Entrar'));
-        await tester.pumpAndSettle();
+        await tapVisible(tester, find.widgetWithText(FilledButton, 'Entrar'));
         expect(find.text('Informe seu e-mail.'), findsOneWidget);
         expect(find.text('Informe sua senha.'), findsOneWidget);
 
         // Cadastro.
-        await tester.tap(find.text('Não tem conta? Cadastre-se'));
-        await tester.pumpAndSettle();
-        await tester.tap(find.widgetWithText(FilledButton, 'Cadastrar'));
-        await tester.pumpAndSettle();
+        await tapVisible(tester, find.text('Não tem conta? Cadastre-se'));
+        await tapVisible(tester, find.widgetWithText(FilledButton, 'Cadastrar'));
         expect(find.text('Informe seu nome.'), findsOneWidget);
         await tester.enterText(find.widgetWithText(TextFormField, 'Nome completo'), 'Ana Souza');
         await tester.enterText(find.widgetWithText(TextFormField, 'E-mail'), 'ana@email.com');
         await tester.enterText(find.widgetWithText(TextFormField, 'Senha (mínimo 6 caracteres)'), '123456');
-        await tester.ensureVisible(find.widgetWithText(FilledButton, 'Cadastrar'));
-        await tester.tap(find.widgetWithText(FilledButton, 'Cadastrar'));
-        await tester.pumpAndSettle();
+        await tapVisible(tester, find.widgetWithText(FilledButton, 'Cadastrar'));
 
         // Home -> profissionais -> horários -> confirmação.
         expect(find.text('Escolha uma especialidade'), findsOneWidget);
-        await tester.tap(find.text('Clínica Geral'));
-        await tester.pumpAndSettle();
-        await tester.tap(find.text('Dra. Helena Martins'));
-        await tester.pumpAndSettle();
+        await tapVisible(tester, find.text('Clínica Geral'));
+        await tapVisible(tester, find.text('Dra. Helena Martins'));
 
         // Procura um dia com horários livres (chips "HH:MM").
         final timeChips = find.byWidgetPredicate((w) =>
@@ -72,28 +72,21 @@ void main() {
             w.label is Text &&
             RegExp(r'^\d\d:\d\d$').hasMatch((w.label as Text).data ?? ''));
         for (var i = 0; i < 7 && timeChips.evaluate().isEmpty; i++) {
-          await tester.tap(find.byType(ChoiceChip).at(i));
-          await tester.pumpAndSettle();
+          await tapVisible(tester, find.byType(ChoiceChip).at(i));
         }
         expect(timeChips, findsWidgets, reason: 'deve haver horários livres');
-        await tester.tap(timeChips.first);
-        await tester.pumpAndSettle();
-        await tester.ensureVisible(find.text('Continuar'));
-        await tester.tap(find.text('Continuar'));
-        await tester.pumpAndSettle();
+        await tapVisible(tester, timeChips.first);
+        await tapVisible(tester, find.text('Continuar'));
         expect(find.text('Resumo da consulta'), findsOneWidget);
 
-        await tester.ensureVisible(find.widgetWithText(FilledButton, 'Confirmar agendamento'));
-        await tester.tap(find.widgetWithText(FilledButton, 'Confirmar agendamento'));
-        await tester.pumpAndSettle();
+        await tapVisible(tester, find.widgetWithText(FilledButton, 'Confirmar agendamento'));
 
         // Minhas consultas com a nova consulta e ações.
         expect(find.text('Minhas consultas'), findsOneWidget);
         expect(find.text('Dra. Helena Martins'), findsOneWidget);
         expect(find.text('Cancelar'), findsOneWidget);
 
-        await tester.tap(find.text('Histórico'));
-        await tester.pumpAndSettle();
+        await tapVisible(tester, find.text('Histórico'));
         expect(find.text('Nenhuma consulta no histórico.'), findsOneWidget);
 
         expect(tester.takeException(), isNull);
