@@ -3,6 +3,18 @@
 App mobile em Flutter para agendamento de consultas da Clínica Vida Plena (empresa fictícia).
 Projeto Integrado UNIFEOB – Desenvolvimento Mobile, 3º trimestre de 2026.
 
+## Identificação
+
+| Item | Informação |
+|---|---|
+| Instituição | UNIFEOB – Centro Universitário da Fundação de Ensino Octávio Bastos, Escola de Negócios e Tecnologia EAD |
+| Curso | Análise e Desenvolvimento de Sistemas |
+| Módulo | Desenvolvimento Mobile – 3º trimestre letivo de 2026 |
+| Projeto | Projeto Integrado (PI) – aplicativo mobile em Flutter |
+| Estudante | Júlia Silva da Fonseca – RA 24002057 |
+| Orientadora | Profa. Mariangela Martimbianco Santos |
+| Local e data | São João da Boa Vista, SP – outubro de 2026 |
+
 ## Descrição
 
 O paciente cria conta, vê especialidades, profissionais e horários, agenda, confirma,
