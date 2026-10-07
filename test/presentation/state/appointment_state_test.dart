@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:vida_plena_agenda/data/appointment_repository.dart';
 import 'package:vida_plena_agenda/data/catalog_repository.dart';
+import 'package:vida_plena_agenda/data/reminder_scheduler.dart';
 import 'package:vida_plena_agenda/domain/appointment.dart';
 import 'package:vida_plena_agenda/domain/doctor.dart';
 import 'package:vida_plena_agenda/domain/specialty.dart';
@@ -10,6 +11,8 @@ import 'package:vida_plena_agenda/presentation/state/appointment_state.dart';
 class MockAppointmentRepository extends Mock implements AppointmentRepository {}
 
 class MockCatalogRepository extends Mock implements CatalogRepository {}
+
+class MockReminderScheduler extends Mock implements ReminderScheduler {}
 
 void main() {
   final now = DateTime(2026, 10, 6, 12); // terça-feira
@@ -155,6 +158,47 @@ void main() {
       await loadWith([make('a1')]);
       state.reset();
       expect(state.appointments, isEmpty);
+    });
+  });
+  group('lembretes (RF07)', () {
+    late MockReminderScheduler reminders;
+
+    setUp(() {
+      reminders = MockReminderScheduler();
+      when(() => reminders.schedule(any(), at: any(named: 'at'), doctorName: any(named: 'doctorName')))
+          .thenAnswer((_) async {});
+      when(() => reminders.cancel(any())).thenAnswer((_) async {});
+      state = AppointmentState(appointments, catalog,
+          clock: () => now, idGenerator: () => 'novo', reminders: reminders);
+    });
+
+    test('agendar programa lembrete 24 h antes', () async {
+      await loadWith([]);
+      expect(await state.book(doctor, friday), isTrue);
+      verify(() => reminders.schedule(any(),
+          at: DateTime(2026, 10, 8, 9), doctorName: 'Dra. Ana')).called(1);
+    });
+
+    test('cancelar remove o lembrete', () async {
+      await loadWith([make('a1')]);
+      await state.cancel('a1');
+      verify(() => reminders.cancel('a1')).called(1);
+    });
+
+    test('remarcar reprograma para o novo horário', () async {
+      await loadWith([make('a1')]);
+      await state.reschedule('a1', DateTime(2026, 10, 9, 10));
+      verify(() => reminders.schedule(any(),
+          at: DateTime(2026, 10, 8, 10), doctorName: 'Dra. Ana')).called(1);
+    });
+
+    test('falha no lembrete não derruba o agendamento', () async {
+      when(() => reminders.schedule(any(), at: any(named: 'at'), doctorName: any(named: 'doctorName')))
+          .thenThrow(Exception('sem permissão'));
+      await loadWith([]);
+      expect(await state.book(doctor, friday), isTrue);
+      expect(state.error, isNull);
+      expect(state.upcoming, hasLength(1));
     });
   });
 }

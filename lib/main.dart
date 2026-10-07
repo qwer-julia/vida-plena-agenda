@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'data/local_appointment_repository.dart';
 import 'data/local_catalog_repository.dart';
 import 'data/local_patient_repository.dart';
+import 'data/local_reminder_scheduler.dart';
 import 'presentation/app_theme.dart';
 import 'presentation/pages/auth_gate.dart';
 import 'presentation/state/appointment_state.dart';
@@ -14,10 +15,18 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final prefs = await SharedPreferences.getInstance();
 
+  final reminders = LocalReminderScheduler();
+  try {
+    await reminders.init();
+  } catch (_) {
+    // Sem lembretes (ex.: permissão negada); o app segue funcionando.
+  }
+
   final auth = AuthState(LocalPatientRepository(prefs));
   final appointments = AppointmentState(
     LocalAppointmentRepository(prefs),
     LocalCatalogRepository(),
+    reminders: reminders,
   );
   await auth.restoreSession();
 

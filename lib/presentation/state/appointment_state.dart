@@ -2,10 +2,12 @@ import 'package:flutter/foundation.dart';
 
 import '../../data/appointment_repository.dart';
 import '../../data/catalog_repository.dart';
+import '../../data/reminder_scheduler.dart';
 import '../../domain/appointment.dart';
 import '../../domain/appointment_service.dart';
 import '../../domain/doctor.dart';
 import '../../domain/domain_exception.dart';
+import '../../domain/reminder_policy.dart';
 import '../../domain/specialty.dart';
 
 class AppointmentState extends ChangeNotifier {
@@ -15,6 +17,7 @@ class AppointmentState extends ChangeNotifier {
     AppointmentService? service,
     DateTime Function()? clock,
     String Function()? idGenerator,
+    this._reminders,
   })  : _clock = clock ?? DateTime.now,
         _service = service ?? AppointmentService(clock: clock),
         _newId = idGenerator ??
@@ -22,6 +25,7 @@ class AppointmentState extends ChangeNotifier {
 
   final AppointmentRepository _appointments;
   final CatalogRepository _catalog;
+  final ReminderScheduler? _reminders;
   final AppointmentService _service;
   final DateTime Function() _clock;
   final String Function() _newId;
@@ -115,6 +119,7 @@ class AppointmentState extends ChangeNotifier {
       );
       await _appointments.save(created);
       _all = [..._all, created];
+      await _syncReminder(created);
     });
   }
 
@@ -145,7 +150,29 @@ class AppointmentState extends ChangeNotifier {
       final updated = await change(current);
       await _appointments.save(updated);
       _all = [for (final a in _all) a.id == id ? updated : a];
+      await _syncReminder(updated);
     });
+  }
+
+  /// Lembrete é complemento: se falhar, a consulta já salva continua válida.
+  Future<void> _syncReminder(Appointment a) async {
+    final reminders = _reminders;
+    if (reminders == null) return;
+    try {
+      final at = a.status == AppointmentStatus.agendada ||
+              a.status == AppointmentStatus.confirmada
+          ? reminderTimeFor(a.dateTime, _clock())
+          : null;
+      if (at == null) {
+        await reminders.cancel(a.id);
+      } else {
+        await reminders.schedule(
+          a,
+          at: at,
+          doctorName: doctorById(a.doctorId)?.name ?? 'Clínica Vida Plena',
+        );
+      }
+    } catch (_) {}
   }
 
   String _requirePatient() =>
