@@ -33,6 +33,7 @@ class AppointmentState extends ChangeNotifier {
   bool _loading = false;
   String? _error;
 
+  String? get patientId => _patientId;
   bool get isLoading => _loading;
   String? get error => _error;
   List<Specialty> get specialties => List.unmodifiable(_specialties);
