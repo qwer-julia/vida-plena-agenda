@@ -51,7 +51,7 @@ void main() {
     test('rejeita e-mail já cadastrado', () async {
       when(() => repo.findByEmail(any())).thenAnswer((_) async => ana);
       expect(await state.register(name: 'Ana', email: 'ana@email.com', password: '123456'), isFalse);
-      expect(state.error, contains('já existe'.replaceFirst('já', 'Já')));
+      expect(state.error, contains('Já existe'));
       verifyNever(() => repo.save(any()));
     });
   });
